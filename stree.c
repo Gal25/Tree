@@ -6,6 +6,8 @@
       * a letter indicating the file type (using the same letters as "ls -l")
       * a string indicating the file type, as supplied by nftw()
       * the file's i-node number.
+    
+    https://github.com/kddnewton/tree/blob/main/tree.c#L17 
 */
 #define _XOPEN_SOURCE 600 /* Get nftw() */
 #include <ftw.h>
