@@ -2,7 +2,7 @@ CC = gcc
 AR = ar
 FLAGS = -Wall -g
 
-OBJECTS_stree = stree.o
+OBJECTS_stree = stree2.o
 
 all: stree
 

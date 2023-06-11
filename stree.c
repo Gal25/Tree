@@ -23,29 +23,56 @@
 
 static int file = 0;
 static int dir = 0;
+static int levelFileCount[10];
+static int currFileInLevel[10];
 
-static int countDir(const char *pathname, const struct stat *sbuf, int type, struct FTW *ftwb){
+static int count_files(const char *path, const struct stat *statbuf, int typeflag, struct FTW *ftwbuf) {
+    // if (typeflag == FTW_F) {
+        // printf("Level %d: %s\n", ftwbuf->level, path);
+    //     return 0;
+    // }
+    levelFileCount[ftwbuf->level] += 1;
+    return 0;
+}
 
- 
+static int process_file(const char *path, const struct stat *statbuf, int typeflag, struct FTW *ftwbuf) {
+    if (typeflag == FTW_F) {
+        printf("Last file in directory '%d': %s\n", ftwbuf->base, path);
+    }
     return 0;
 }
 
 static int dirTree(const char *pathname, const struct stat *sbuf, int type, struct FTW *ftwb)
 {
-
      if (type == FTW_NS) {
         printf("?");
     } else {
-        // printf("%*s", 4 * ftwb->level, "");
+        char* token = strtok(pathname, "/");
+        token = strtok(NULL, "/");
+ 
+        while (token != NULL) {
+            if(token[0] == '.'){
+                return 0; 
+            }
+            token = strtok(NULL, "/");
+        }
         if( ftwb->level ==0){
             printf(".\n");
         }
         else{
             for(int i=0; i< ftwb->level-1; i++){
-                printf("|  ");
+                printf("│  ");
+                currFileInLevel[ftwb->level]++;
             
             }
-            printf("|--");
+            if(currFileInLevel[ftwb->level] == levelFileCount[ftwb->level]-1){
+                printf("└──");
+            }
+            else{
+                printf("├──");
+                currFileInLevel[ftwb->level]++;
+            }
+            
 
             switch (sbuf->st_mode & S_IFMT) {
                 case S_IFREG:  printf("[-"); break;
@@ -94,13 +121,16 @@ static int dirTree(const char *pathname, const struct stat *sbuf, int type, stru
 int main(int argc, char *argv[])
 {
     int flags = FTW_PHYS;  /* Perform a physical walk instead of following symbolic links */
+    memset(currFileInLevel, 0, 10);
 
     if (argc != 2) {
         fprintf(stderr, "Usage: %s directory-path\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    nftw(argv[1], countDir, 10, flags);
+    int result = nftw(argv[1], count_files, 10, flags);
+
+    int results = nftw(argv[1], process_file, 10, flags);
 
     if (nftw(argv[1], dirTree, 10, flags) == -1) {
         perror("nftw");
