@@ -1,3 +1,5 @@
+//help by https://github.com/kddnewton/tree/blob/main/tree.c#L17 
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -84,7 +86,7 @@ int walk(const char* directory, const char* prefix, counter_t *counter) {
 
 
     if (!stat(curr_path, &fileStat)) {
-        printf((S_ISDIR(fileStat.st_mode))  ? "[d" : "-");
+        printf((S_ISDIR(fileStat.st_mode))  ? "[d" : "[-");
     } else {
         perror("Error in stat");
     }
